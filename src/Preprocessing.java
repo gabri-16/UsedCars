@@ -15,9 +15,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import utils.Car;
 
-public class Project {
+public class Preprocessing {
 
-    public static class ProjectMapper extends Mapper<LongWritable, Text, LongWritable, Car>{
+    public static class PreprocessingMapper extends Mapper<LongWritable, Text, LongWritable, Car>{
         
         private static final String WHITESPACE_REGEX = "\\s+";
         private static final String WHITESPACE_REPLACER = "_";
@@ -42,7 +42,7 @@ public class Project {
        }
     }
 
-    public static class ProjectReducer extends Reducer<LongWritable, Car, NullWritable, Car> {
+    public static class PreprocessingReducer extends Reducer<LongWritable, Car, NullWritable, Car> {
 
         final NullWritable nw  = NullWritable.get();
 
@@ -67,13 +67,13 @@ public class Project {
             job.setNumReduceTasks(Integer.parseInt(args[2]));
 	}
 
-        job.setJarByClass(Project.class);
+        job.setJarByClass(Preprocessing.class);
         
-        job.setMapperClass(ProjectMapper.class);
+        job.setMapperClass(PreprocessingMapper.class);
         job.setMapOutputKeyClass(LongWritable.class);
         job.setMapOutputValueClass(Car.class);
 		
-	job.setReducerClass(ProjectReducer.class);
+	job.setReducerClass(PreprocessingReducer.class);
 	job.setOutputKeyClass(NullWritable.class);
 	job.setOutputValueClass(Car.class);
 
