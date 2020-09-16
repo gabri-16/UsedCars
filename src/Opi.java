@@ -13,7 +13,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import utils.Car;
-//15
+
 public class Opi {
 
     public static class OpiMapper extends Mapper<Object, Text, Text, DoubleWritable>{
@@ -64,14 +64,15 @@ public class Opi {
              fs.delete(outputPath, true);
         }
 
-        job.setJarByClass(Opi.class);
-        job.setMapperClass(OpiMapper.class);
-		
-	if(args.length>2){
-	    if(Integer.parseInt(args[2])>=0){
-	        job.setNumReduceTasks(Integer.parseInt(args[2]));
-            }
+	if(args.length > 2 && Integer.parseInt(args[2]) >= 0) {
+            job.setNumReduceTasks(Integer.parseInt(args[2]));
 	}
+
+        job.setJarByClass(Opi.class);
+
+        job.setMapperClass(OpiMapper.class);
+	job.setMapOutputKeyClass(Text.class);
+        job.setOutputValueClass(DoubleWritable.class);	
 
 	job.setReducerClass(OpiReducer.class);
 	job.setOutputKeyClass(Text.class);

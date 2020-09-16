@@ -28,8 +28,7 @@ public class Region {
    
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
-            String[] kvTokens = value.toString().split("\t");
-            String[] tokens = kvTokens[1].split(" ");            
+            String[] tokens = value.toString().split(" ");            
 
             if (tokens[3].trim().equals(GAS_FUEL)) { 
                 region.set(tokens[0].trim());
@@ -81,14 +80,15 @@ public class Region {
              fs.delete(outputPath, true);
         }
 
-        job.setJarByClass(Region.class);
-        job.setMapperClass(RegionMapper.class);
-		
-	if(args.length>2){
-	    if(Integer.parseInt(args[2])>=0){
-	        job.setNumReduceTasks(Integer.parseInt(args[2]));
-            }
+	if (args.length > 2 && Integer.parseInt(args[2]) >= 0) {
+            job.setNumReduceTasks(Integer.parseInt(args[2]));
 	}
+
+        job.setJarByClass(Region.class);
+
+        job.setMapperClass(RegionMapper.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);		
 
 	job.setReducerClass(RegionReducer.class);
 	job.setOutputKeyClass(Text.class);
