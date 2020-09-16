@@ -20,23 +20,17 @@ public class Project {
         private static final String WHITESPACE_REGEX = "\\s+";
         private static final String WHITESPACE_REPLACER = "_";
 
-        private String region;
-        private int price;
-        private String brand;
-        private String fuel;
-        private int odometer;
-
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String[] tokens = value.toString().split(",");
             try {   
-                region = removeWhitespaces(tokens[2].trim());
-                price = Integer.parseInt(tokens[4].trim());
-                brand = removeWhitespaces(tokens[6].trim());
-                fuel = removeWhitespaces(tokens[10].trim());
-                odometer = Integer.parseInt(tokens[11].trim());
+                final String region = removeWhitespaces(tokens[2].trim());
+                final int price = Integer.parseInt(tokens[4].trim());
+                final String brand = removeWhitespaces(tokens[6].trim());
+                final String fuel = removeWhitespaces(tokens[10].trim());
+                final int odometer = Integer.parseInt(tokens[11].trim());
 
-                Car car = new Car(region, price, brand, fuel, odometer);
-                Text dummyKey = new Text(tokens[0].trim());
+                final Car car = new Car(region, price, brand, fuel, odometer);
+                final Text dummyKey = new Text(tokens[0].trim());
                 context.write(dummyKey, car);
 
             } catch (NumberFormatException e) {

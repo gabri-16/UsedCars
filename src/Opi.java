@@ -18,9 +18,6 @@ public class Opi {
 
     public static class OpiMapper extends Mapper<Object, Text, Text, DoubleWritable>{
         
-        private static final String WHITESPACE_REGEX = "\\s+";
-        private static final String WHITESPACE_REPLACER = "_";
-
         private int price;
         private Text brand = new Text();
         private int odometer;
@@ -43,10 +40,9 @@ public class Opi {
 
         private DoubleWritable avgOpi = new DoubleWritable(); 
 
-        private int count = 0;
-        private double sum = 0;        
-
 	public void reduce(Text key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
+            int count = 0;
+            double sum = 0;
             for (final DoubleWritable opi: values) {
                sum += opi.get();
                count++;
