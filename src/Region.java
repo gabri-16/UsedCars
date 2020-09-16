@@ -16,10 +16,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import utils.Car;
-//15
+
 public class Region {
 
-    public static class RegionMapper extends Mapper<Object, Text, Text, Text>{
+    public static class RegionMapper extends Mapper<Object, Text, Text, Text> {
     
         private static final String GAS_FUEL = "gas";        
 
@@ -28,7 +28,8 @@ public class Region {
    
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
-            String[] tokens = value.toString().split(" ");
+            String[] kvTokens = value.toString().split("\t");
+            String[] tokens = kvTokens[1].split(" ");            
 
             if (tokens[3].trim().equals(GAS_FUEL)) { 
                 region.set(tokens[0].trim());
@@ -43,24 +44,28 @@ public class Region {
         private Text topBrand = new Text();
 
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+
             final Map<String, Integer> brandFrequency = new HashMap();
-            for (final Text region: values) {
-               final String regionName = region.toString();
-               if (brandFrequency.containsKey(regionName)) {
-                   brandFrequency.put(regionName, brandFrequency.get(regionName) + 1);
+            for (final Text brand: values) {
+               final String brandName = brand.toString();
+               if (brandFrequency.containsKey(brandName)) {
+                   brandFrequency.put(brandName, brandFrequency.get(brandName) + 1);
                } else {
-                   brandFrequency.put(regionName, 1);
+                   brandFrequency.put(brandName, 1);
                }
             }
-
+            
             Entry<String, Integer> max = null;           
+            max = brandFrequency.entrySet().iterator().next();
+
             for (final Entry<String, Integer> e: brandFrequency.entrySet()) {
                 if (max == null || e.getValue() > max.getValue()) {
                     max = e; 
                 }
             }
+
             topBrand.set(max.getKey());          
-            context.write(key, values.iterator().next());
+            context.write(key, topBrand);
 	}
     }
 
