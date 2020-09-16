@@ -88,7 +88,7 @@ public class Join {
     public static void main(String[] args) throws Exception {
     
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "word count");
+        Job job = Job.getInstance(conf, "3-join");
 
         Path inputPath1 = new Path(args[0]);
         Path inputPath2 = new Path(args[1]);

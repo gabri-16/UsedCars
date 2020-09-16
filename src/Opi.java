@@ -55,7 +55,7 @@ public class Opi {
     public static void main(String[] args) throws Exception {
     
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "word count");
+        Job job = Job.getInstance(conf, "2a-opi");
 
         Path inputPath = new Path(args[0]), outputPath = new Path(args[1]);
         FileSystem fs = FileSystem.get(new Configuration());

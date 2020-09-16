@@ -54,7 +54,7 @@ public class Project {
     public static void main(String[] args) throws Exception {
     
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "word count");
+        Job job = Job.getInstance(conf, "1-preprocessing");
 
         Path inputPath = new Path(args[0]), outputPath = new Path(args[1]);
         FileSystem fs = FileSystem.get(new Configuration());
