@@ -4,6 +4,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -12,15 +14,15 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import utils.Car;
-//15
+
 public class Project {
 
-    public static class ProjectMapper extends Mapper<Object, Text, Text, Car>{
+    public static class ProjectMapper extends Mapper<LongWritable, Text, LongWritable, Car>{
         
         private static final String WHITESPACE_REGEX = "\\s+";
         private static final String WHITESPACE_REPLACER = "_";
 
-        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+        public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             String[] tokens = value.toString().split(",");
             try {   
                 final String region = removeWhitespaces(tokens[2].trim());
@@ -28,11 +30,8 @@ public class Project {
                 final String brand = removeWhitespaces(tokens[6].trim());
                 final String fuel = removeWhitespaces(tokens[10].trim());
                 final int odometer = Integer.parseInt(tokens[11].trim());
-
                 final Car car = new Car(region, price, brand, fuel, odometer);
-                final Text dummyKey = new Text(tokens[0].trim());
-                context.write(dummyKey, car);
-
+                context.write(key, car);
             } catch (NumberFormatException e) {
 
             }
@@ -43,10 +42,12 @@ public class Project {
        }
     }
 
-    public static class ProjectReducer extends Reducer<Text, Car, Text, Car> {
+    public static class ProjectReducer extends Reducer<LongWritable, Car, NullWritable, Car> {
 
-	public void reduce(Text key, Iterable<Car> values, Context context) throws IOException, InterruptedException {
-          context.write(key, values.iterator().next());
+        final NullWritable nw  = NullWritable.get();
+
+	public void reduce(LongWritable key, Iterable<Car> values, Context context) throws IOException, InterruptedException {
+          context.write(nw, values.iterator().next());
 	}
     }
 
@@ -62,17 +63,18 @@ public class Project {
              fs.delete(outputPath, true);
         }
 
-        job.setJarByClass(Project.class);
-        job.setMapperClass(ProjectMapper.class);
-		
-	if(args.length>2){
-	    if(Integer.parseInt(args[2])>=0){
-	        job.setNumReduceTasks(Integer.parseInt(args[2]));
-            }
+      	if(args.length > 2 && Integer.parseInt(args[2]) >= 0) {
+            job.setNumReduceTasks(Integer.parseInt(args[2]));
 	}
 
+        job.setJarByClass(Project.class);
+        
+        job.setMapperClass(ProjectMapper.class);
+        job.setMapOutputKeyClass(LongWritable.class);
+        job.setMapOutputValueClass(Car.class);
+		
 	job.setReducerClass(ProjectReducer.class);
-	job.setOutputKeyClass(Text.class);
+	job.setOutputKeyClass(NullWritable.class);
 	job.setOutputValueClass(Car.class);
 
 	FileInputFormat.addInputPath(job, inputPath);
