@@ -9,8 +9,8 @@ public class JoinPair implements Writable {
     private static final int DEFAULT_FLAG_VALUE = 0;
     private static final String DEFAULT_VALUE_VALUE = "";
 
-    int flag;
-    String value;  
+    private int flag;
+    private String value;  
 
     public JoinPair() {
         flag = DEFAULT_FLAG_VALUE;
@@ -32,6 +32,13 @@ public class JoinPair implements Writable {
          value = in.readUTF();
      } 
 
+     public int getFlag() {
+         return this.flag;
+     }
+
+     public String getValue() {
+         return this.value;
+     }
 
      @Override
      public String toString() {
