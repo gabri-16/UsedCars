@@ -47,6 +47,9 @@ public class Car implements Writable {
             odometer = in.readInt();
           } 
 
+          public boolean containsMissingData() {
+            return region.equals("") || price == 0 || brand.equals("") || fuel.equals("") || odometer == 0;
+          }
 
           @Override
           public String toString() {

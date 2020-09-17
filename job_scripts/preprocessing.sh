@@ -6,7 +6,7 @@ cd bin
 jar -cf uc.jar *
 hdfs dfs -rm -skipTrash uc.jar
 hdfs dfs -put uc.jar
-hadoop jar uc.jar Preprocessing dataset/car-test.csv out
+hadoop jar uc.jar Preprocessing dataset/vehicles.csv out
 hdfs dfs -ls out
 cd ..
-hdfs dfs -cat out/part-r-00002
+#hdfs dfs -cat out/part-r-00002

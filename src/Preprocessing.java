@@ -31,9 +31,13 @@ public class Preprocessing {
                 final String fuel = removeWhitespaces(tokens[10].trim());
                 final int odometer = Integer.parseInt(tokens[11].trim());
                 final Car car = new Car(region, price, brand, fuel, odometer);
-                context.write(key, car);
+                if (!car.containsMissingData()) {
+                  context.write(key, car);
+                }
             } catch (NumberFormatException e) {
 
+            } catch (IndexOutOfBoundsException e2) {
+            
             }
         }
 
