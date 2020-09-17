@@ -2,7 +2,7 @@
 # Launch it from project root to build the project and run the jobs
 
 #Vars
-n_reducer=1
+n_reducer=5
 
 #Remove jar from hdfs (if present)
 hdfs dfs -test -e uc.jar
@@ -17,6 +17,7 @@ set -e # Break pipeline on error (don't move before test!)
 #Compile src
 javac -d bin -cp bin:$(hadoop classpath) src/utils/Car.java
 javac -d bin -cp bin:$(hadoop classpath) src/utils/JoinPair.java
+javac -d bin -cp bin:$(hadoop classpath) src/utils/BrandQuantityPair.java
 javac -d bin -cp bin:$(hadoop classpath) src/Preprocessing.java
 javac -d bin -cp bin:$(hadoop classpath) src/Opi.java
 javac -d bin -cp bin:$(hadoop classpath) src/Region.java
