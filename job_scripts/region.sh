@@ -6,7 +6,7 @@ cd bin
 jar -cf uc.jar *
 hdfs dfs -rm -skipTrash uc.jar
 hdfs dfs -put uc.jar
-hadoop jar uc.jar Region out out3
-hdfs dfs -ls out3
+hadoop jar uc.jar Region out out2b
+hdfs dfs -ls out2b
 cd ..
-hdfs dfs -cat out3/part-r-00002
+#hdfs dfs -cat out2b/part-r-00002
