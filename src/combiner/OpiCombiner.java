@@ -14,9 +14,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import utils.Car;
 
-public class Opi {
+public class OpiCombiner {
 
-    public static class OpiMapper extends Mapper<Object, Text, Text, DoubleWritable>{
+    public static class OpiCombinerMapper extends Mapper<Object, Text, Text, DoubleWritable>{
         
         private int price;
         private Text brand = new Text();
@@ -36,7 +36,14 @@ public class Opi {
         }
     }
 
-    public static class OpiReducer extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
+    public static class OpiCombinerCombiner extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
+
+      public void reduce(Text key, Iterable<BrandQuantityPair> values, Context context) throws IOException, InterruptedException {
+        
+      }
+    }
+
+    public static class OpiCombinerReducer extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
 
         private DoubleWritable avgOpi = new DoubleWritable(); 
 
@@ -68,13 +75,14 @@ public class Opi {
             job.setNumReduceTasks(Integer.parseInt(args[2]));
 	}
 
-        job.setJarByClass(Opi.class);
+        job.setJarByClass(OpiCombiner.class);
 
-        job.setMapperClass(OpiMapper.class);
+        job.setMapperClass(OpiCombinerMapper.class);
 	job.setMapOutputKeyClass(Text.class);
         job.setOutputValueClass(DoubleWritable.class);	
 
-	job.setReducerClass(OpiReducer.class);
+        job.setCombinerClass(OpiCombinerCombiner.class);
+
 	job.setOutputKeyClass(Text.class);
 	job.setOutputValueClass(DoubleWritable.class);
 

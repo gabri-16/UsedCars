@@ -18,6 +18,7 @@ set -e # Break pipeline on error (don't move before test!)
 javac -d bin -cp bin:$(hadoop classpath) src/utils/Car.java
 javac -d bin -cp bin:$(hadoop classpath) src/utils/JoinPair.java
 javac -d bin -cp bin:$(hadoop classpath) src/utils/BrandQuantityPair.java
+javac -d bin -cp bin:$(hadoop classpath) src/utils/OpiAveragePair.java 
 javac -d bin -cp bin:$(hadoop classpath) src/Preprocessing.java
 javac -d bin -cp bin:$(hadoop classpath) src/Opi.java
 javac -d bin -cp bin:$(hadoop classpath) src/Region.java

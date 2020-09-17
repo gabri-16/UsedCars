@@ -17,9 +17,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import utils.Car;
 
-public class Region {
+public class RegionCombiner {
 
-    public static class RegionMapper extends Mapper<Object, Text, Text, Text> {
+    public static class RegionCombinerMapper extends Mapper<Object, Text, Text, Text> {
     
         private static final String GAS_FUEL = "gas";        
 
@@ -38,7 +38,7 @@ public class Region {
         }
     }
 
-    public static class RegionReducer extends Reducer<Text, Text, Text, Text> {
+    public static class RegionCombinerReducer extends Reducer<Text, Text, Text, Text> {
 
         private Text topBrand = new Text();
 
@@ -84,13 +84,13 @@ public class Region {
             job.setNumReduceTasks(Integer.parseInt(args[2]));
 	}
 
-        job.setJarByClass(Region.class);
+        job.setJarByClass(RegionCombiner.class);
 
-        job.setMapperClass(RegionMapper.class);
+        job.setMapperClass(RegionCombinerMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);		
 
-	job.setReducerClass(RegionReducer.class);
+	job.setReducerClass(RegionCombinerReducer.class);
 	job.setOutputKeyClass(Text.class);
 	job.setOutputValueClass(Text.class);
 
