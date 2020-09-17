@@ -13,16 +13,16 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import utils.Car;
+import utils.OpiAveragePair;
 
 public class OpiCombiner {
 
-    public static class OpiCombinerMapper extends Mapper<Object, Text, Text, DoubleWritable>{
+    public static class OpiCombinerMapper extends Mapper<Object, Text, Text, OpiAveragePair>{
         
         private int price;
         private Text brand = new Text();
         private int odometer;
-
-        private DoubleWritable opi = new DoubleWritable();
+        private double opi;
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String[] tokens = value.toString().split(" ");
@@ -30,29 +30,37 @@ public class OpiCombiner {
             price = Integer.parseInt(tokens[1].trim());
             brand.set(tokens[2].trim());
             odometer = Integer.parseInt(tokens[4].trim()); 
-          
-            opi.set(((double) odometer) / price);
-            context.write(brand, opi);            
+            opi = ((double) odometer) / price;
+            context.write(brand, new OpiAveragePair(opi, 1));            
         }
     }
 
-    public static class OpiCombinerCombiner extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
+    public static class OpiCombinerCombiner extends Reducer<Text, OpiAveragePair, Text, OpiAveragePair> {
 
-      public void reduce(Text key, Iterable<BrandQuantityPair> values, Context context) throws IOException, InterruptedException {
-        
+      double avgOpi;
+
+      public void reduce(Text key, Iterable<OpiAveragePair> values, Context context) throws IOException, InterruptedException {
+            int count = 0;
+            double sum = 0;
+            for (final OpiAveragePair pair: values) {
+               sum += pair.getAverage();
+               count++;
+            }          
+            avgOpi = sum / count;
+            context.write(key, new OpiAveragePair(avgOpi, count));        
       }
     }
 
-    public static class OpiCombinerReducer extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
+    public static class OpiCombinerReducer extends Reducer<Text, OpiAveragePair, Text, DoubleWritable> {
 
         private DoubleWritable avgOpi = new DoubleWritable(); 
 
-	public void reduce(Text key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
+	public void reduce(Text key, Iterable<OpiAveragePair> values, Context context) throws IOException, InterruptedException {
             int count = 0;
             double sum = 0;
-            for (final DoubleWritable opi: values) {
-               sum += opi.get();
-               count++;
+            for (final OpiAveragePair opi: values) {
+               sum += opi.getAverage() * opi.getQuantity();
+               count += opi.getQuantity();
             }          
             avgOpi.set(sum / count);
             context.write(key, avgOpi);
@@ -79,7 +87,7 @@ public class OpiCombiner {
 
         job.setMapperClass(OpiCombinerMapper.class);
 	job.setMapOutputKeyClass(Text.class);
-        job.setOutputValueClass(DoubleWritable.class);	
+        job.setOutputValueClass(OpiAveragePair.class);	
 
         job.setCombinerClass(OpiCombinerCombiner.class);
 
