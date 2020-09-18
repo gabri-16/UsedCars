@@ -1,7 +1,26 @@
 \chapter{Spark}
 
-\section{Workflow}
+\section{Job description}
 
+All jobs specified in section \ref{workflow} are executed in the same Spark file. The dataset is loaded as a Spark ``DataFrame'' and every operation will lean on Spark SQL.
 
+Figure ? shows the spark DAG. 
 
 \section{Performance evaluation}
+
+Given cluster characterisics (10 nodes, 4 core per node) and by following best practices, there are not much available settings in order to tune CPU usage. An overall of 10 executors are created, each one equipped with 3 cores.
+
+Performance are evaluated upon an overall of 10 runs. Results are shown in table \ref{table:spark-perf}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{ |c c|c| } 
+    \hline
+    \multirow{2}{4em}{Replication factor} 
+    & 1   &  \\      
+    & 100 &  \\ 
+    \hline
+  \end{tabular}
+  \caption{Performance results expressed as elapsed time in seconds.}
+  \label{table:spark-perf}
+\end{table}
