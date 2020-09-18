@@ -2,8 +2,8 @@
 # Launch it from project root to build the project and run the jobs
 
 #Vars
-n_reducer=5
-combiner=1 # 0 -> off; any -> on
+n_reducer=20
+combiner=0 # 0 -> off; any -> on
 
 #Remove jar from hdfs (if present)
 hdfs dfs -test -e uc.jar

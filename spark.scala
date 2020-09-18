@@ -6,7 +6,7 @@ preprocessedDF.cache
 
 val df2a = preprocessedDF.withColumn("opi", $"odometer" / $"price").select("brand", "opi").groupBy("brand").avg().withColumnRenamed("avg(opi)", "opi")
 
-val df2b = preprocessedDF.select("region", "brand").groupBy("region", "brand").count.groupBy("region").agg(max("count"), first("brand").as("brand")).select("region", "brand")
+val df2b = preprocessedDF.filter($"fuel" === "gas").select("region", "brand").groupBy("region", "brand").count.groupBy("region").agg(max("count"), first("brand").as("brand")).select("region", "brand")
 
 val res = df2a.join(df2b, Seq("brand")).select("region", "brand", "opi")
 //res.collect

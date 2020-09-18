@@ -48,10 +48,15 @@ public class Preprocessing {
 
     public static class PreprocessingReducer extends Reducer<LongWritable, Car, NullWritable, Car> {
 
+        private static final int REPLICATION_FACTOR = 100;
+
         final NullWritable nw  = NullWritable.get();
 
 	public void reduce(LongWritable key, Iterable<Car> values, Context context) throws IOException, InterruptedException {
-          context.write(nw, values.iterator().next());
+          final Car car = values.iterator().next();
+          for (int i = 0; i < REPLICATION_FACTOR; i++) {
+            context.write(nw, car);
+          }
 	}
     }
 
