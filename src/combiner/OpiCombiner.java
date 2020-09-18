@@ -87,7 +87,7 @@ public class OpiCombiner {
 
         job.setMapperClass(OpiCombinerMapper.class);
 	job.setMapOutputKeyClass(Text.class);
-        job.setOutputValueClass(OpiAveragePair.class);	
+        job.setMapOutputValueClass(OpiAveragePair.class);	
 
         job.setCombinerClass(OpiCombinerCombiner.class);
 

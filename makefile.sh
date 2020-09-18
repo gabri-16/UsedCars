@@ -3,6 +3,7 @@
 
 #Vars
 n_reducer=5
+combiner=1 # 0 -> off; any -> on
 
 #Remove jar from hdfs (if present)
 hdfs dfs -test -e uc.jar
@@ -23,6 +24,7 @@ javac -d bin -cp bin:$(hadoop classpath) src/Preprocessing.java
 javac -d bin -cp bin:$(hadoop classpath) src/Opi.java
 javac -d bin -cp bin:$(hadoop classpath) src/Region.java
 javac -d bin -cp bin:$(hadoop classpath) src/Join.java
+javac -d bin -cp bin:$(hadoop classpath) src/combiner/OpiCombiner.java
 
 # Create jar and put it in hdfs
 cd bin
@@ -33,7 +35,13 @@ hdfs dfs -put uc.jar
 start=$(date +%s)
 
 hadoop jar uc.jar Preprocessing dataset/vehicles.csv out $n_reducer
-hadoop jar uc.jar Opi out out2a $n_reducer
+if [[ $combiner == 0 ]]
+then
+  hadoop jar uc.jar Opi out out2a $n_reducer
+else
+  hadoop jar uc.jar OpiCombiner out out2a $n_reducer  
+fi
+
 hadoop jar uc.jar Region out out2b $n_reducer
 hadoop jar uc.jar Join out2a out2b out3 $n_reducer
 
