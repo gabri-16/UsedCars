@@ -2,7 +2,7 @@
 
 \section{Job description}
 
-All jobs specified in section \ref{workflow} are executed in the same Spark file. The dataset is loaded as a Spark ``DataFrame'' and every operation will lean on Spark SQL.
+A unique Spark file will execute all jobs specified in section \ref{workflow}. The dataset is loaded as a Spark ``DataFrame'' and every operation will lean on ``SparkSQL'' layer.
 
 Figure \ref{fig:spark-DAG} shows the complete DAG correspnding to the main job created by Spark. Figure \ref{fig:spark-DAG-info} shows Spark DAG accompained with few extra info.
 
@@ -22,7 +22,9 @@ Figure \ref{fig:spark-DAG} shows the complete DAG correspnding to the main job c
 
 Since the size of tables used in the two join operations is not excessive, the usage of the broadcast feature may be used on one table. Such an operation makes Spark split the job in three pipelined different jobs (few stages are skipped though).
 
-DAGs are reported in figures \ref{fig:sspark-broad-DAG-1}, \ref{fig:spark-broad-DAG-2} and \ref{fig:spark-broad-DAG-3}.
+The broadcast version results on an overall of 800 tasks (against the 1200 of the basic one), a more efficient usage of memory (garbage collection time) and a decrease of execution time close to 8/9\%.
+
+DAGs for the broadcast version are reported in figures \ref{fig:sspark-broad-DAG-1}, \ref{fig:spark-broad-DAG-2} and \ref{fig:spark-broad-DAG-3}.
 
 \begin{figure}[H]
 	\centering
@@ -54,7 +56,7 @@ Performance are evaluated by varying the number of executors and cores per execu
 Let's consider cluster characteristics (10 nodes, 4 cores per node) and given constraints (usage of 8 CPUs at most).   
 Each casuistry result is the average value upon 3 runs. Results are shown in table \ref{table:spark-perf}.
 
-As we can notice, results confirm common best practice rules: best performances among all more promising combinations are obtained using the maximum number of resources ( 8 CPUs); moreover, the whole application speeds up when assigning more than one core to each executor.
+As we can notice, results confirm common best practice rules: best performances among all more promising combinations are obtained using the maximum number of resources (8 CPUs); moreover, the whole application speeds up when assigning more than one core to each executor.
 
 \begin{table}[H]
   \centering

@@ -33,8 +33,8 @@ Figure \ref{fig:MR-workflow} shows the adopted workflow\footnote{It is not the o
 
 The pipeline is made up of four different jobs, that is:
 \begin{itemize}
-  \item \textbf{Job 1: Preprocessing}: The job executes all preprocessing operation needed to correctly use the dataset in next jobs. Firstly, it cleans the raw dataset by droppinig records that contain missing values and by eliminating useless columns. Then, it executes the dataset growth operation, namely, each remaining record is copied by a certain replication factor so that the output dataset contains enough amount of data. The default replication factor is 100 (but it can be customized).  
-  \item \textbf{Job 2a: Opi}: It calculates the opi for each brand.
+  \item \textbf{Job 1: Preprocessing}: It executes all preprocessing operation needed to correctly use the dataset in next jobs. Firstly, it cleans the raw dataset by droppinig records that contain missing values and by eliminating useless columns. Then, it executes the dataset growth operation, namely, each remaining record is copied by a certain replication factor so that the output dataset contains enough amount of data. The default replication factor is 100 (but it can be customized).  
+  \item \textbf{Job 2a: Opi}: It calculates the OPI for each brand.
   \item \textbf{Job 2b: Region}: It calculates the most widespread brand for each region.
   \item \textbf{Job 3: Join}: It merges partial results of jobs 2a and 2b.
 \end{itemize}
@@ -42,7 +42,7 @@ The pipeline is made up of four different jobs, that is:
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.6]{images/2-mapreduce/MR-workflow.png}
-	\caption{Adopted workflow for MR jobs.}
+	\caption{Adopted workflow for query execution.}
 	\label{fig:MR-workflow}
 \end{figure}
 

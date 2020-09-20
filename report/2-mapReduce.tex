@@ -6,8 +6,8 @@
 
 Job execution and interfaces are described in figure \ref{fig:MR-job-1}.
  
-Raw records are read and parsed into ``Car'', i.e. custom ``Writable'' objects, during map stage. 
-Each car stores data about:
+Each raw record is read and parsed into a ``Car'', i.e. a custom ``Writable'' object, during map stage. 
+Each ``Car'' stores data about:
 \begin{itemize}
  \item Region
  \item Price
@@ -16,9 +16,9 @@ Each car stores data about:
  \item Odometer
 \end{itemize}
 
-The map output is a pair where the key is the default key used by Hadoop when reading text files and the value is the car itself.
+The mapper output is a pair where the key is the default one used by Hadoop when reading text files and the value is the ``Car'' itself.
 
-The reduce stage replaces the default key with a ``NullableWritable'' so that the whole job output is a set of records yet and then publishes each record several times as specified by the replication factor.
+The reduce stage replaces the default key with a ``NullableWritable'' so that the whole job output is a set of records yet. Then, it publishes each record several times as specified by the replication factor.
 
 \begin{figure}[H]
 	\centering
@@ -31,9 +31,9 @@ The reduce stage replaces the default key with a ``NullableWritable'' so that th
 
 Job execution and interfaces are described in figure \ref{fig:MR-job-2a}.
 
-The map stage input value is a car encoded as text. The key is the Hadoop default one for text files and its irrelevant. The mapper calculates the OPI for such car using price and odometer fields, and it gives as output a pair consisting of (brand, OPI).
+The map stage input value is a ``Car'' encoded as text. The key is the Hadoop default one (it won't be used). The mapper calculates the OPI for a given car using price and odometer fields and gives a pair consisting of (brand, OPI) as output.
 
-The reduce stage just calculates the average value using single OPI values and reports it as output.
+The reduce stage just calculates average values using single OPIs and reports it as output.
    
 \begin{figure}[H]
 	\centering
@@ -46,7 +46,7 @@ The reduce stage just calculates the average value using single OPI values and r
 
 Job execution and interfaces are described in figure \ref{fig:MR-job-2b}.
 
-The map stage input value is a car encoded as text. The key is the Hadoop default one for text files and its irrelevant. If the fuel type is correct, the mapper generates as output a pair (region, brand) so that reduce stage can operate per region basis.
+The map stage input value is a ``Car' encoded as text. The key is the Hadoop default one for text files (it won't be used). If the fuel type is correct, the mapper generates as output a pair (region, brand) so that reduce stage can operate per region basis.
 
 The reducer, given a region, firstly calculates the cardinality for each brand by collecting the input pairs. Then, it calculates the maximum and gives it as output in the form of (region, brand).
 
@@ -64,7 +64,7 @@ Job execution and interfaces are described in figure \ref{fig:MR-job-3}.
 The map stage takes as input pairs structured as (Text, Text). The source of a given pair can be from job 2a output or from job 2b output. By examinating it, it is discovered the source and the pair is marked with a flag.
 Since the join key will be the brand, the output of map stage is a pair (brand, (flag, region)), where flag and region are encapsulated into a ``JoinPair'' (a custom ``Writable'').
 
-The reducer executes the standard join algorithm on input items and creates output pairs in the form (region, (brand, OPI)). 
+The reducer executes the join algorithm on input items and creates output pairs in the form (region, (brand, OPI)). 
 
 \begin{figure}[H]
 	\centering
@@ -80,7 +80,25 @@ Performance are evaluated by varying the number of reducers, by enabling the use
 
 Each casuistry result is the average value upon 3 runs. Results are shown in tables \ref{table-mr-perf-1} and \ref{table-mr-perf-100}.
 
-\begin{table}
+As we can notice, the optimal number of reducers is 5\footnote{Actually, a more fine-grained analysis could be done by tuning the number of reducers on sigle jobs (instead of the same for each one). This could lead to find a more efficint setup but the number of combinations is quite huge and this argument will not be covered. }: too many reducers are an overkill due to task bootstrap and to the slender amount of data; on the other hand, too few reducers can't parallelize the work in the best way.  
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{ |c c|c c c c c c c| } 
+    \hline
+    \multicolumn{2}{ |c| }{} & \multicolumn{7}{ c| }{Reducers} \\
+    \multicolumn{2}{ |c| }{} & 1 & 2 & 5 & 6 & 8 & 10 & 100 \\
+    \hline
+    \multirow{2}{4em}{Combiner} 
+    & No  & 292 & 244 & 223 & 235 & 251 & 280 & 1235 \\      
+    & Yes &  &  &  &  &  &  & \\ 
+    \hline
+  \end{tabular}
+  \caption{Performance results expressed as elapsed time in seconds using \textbf{replication factor = 100}.}
+  \label{table-mr-perf-100}
+\end{table}
+
+\begin{table}[H]
   \centering
   \begin{tabular}{ |c c|c c c c c| } 
     \hline
@@ -89,25 +107,9 @@ Each casuistry result is the average value upon 3 runs. Results are shown in tab
     \hline
     \multirow{2}{4em}{Combiner} 
     & No  & 223 & 162 & 168 & 216 & 1400 \\      
-    & Yes &     &     &     &     &      \\ 
+    & Yes &  &  &  &  &   \\ 
     \hline
   \end{tabular}
   \caption{Performance results expressed as elapsed time in seconds using \textbf{replication factor = 1}.}
   \label{table-mr-perf-1}
-\end{table}
-
-\begin{table}
-  \centering
-  \begin{tabular}{ |c c|c c c c c| } 
-    \hline
-    \multicolumn{2}{ |c| }{} & \multicolumn{5}{ c| }{Reducers} \\
-    \multicolumn{2}{ |c| }{} & 1 & 2& 5& 10 & 100 \\
-    \hline
-    \multirow{2}{4em}{Combiner} 
-    & No  &     &     &     &     &     \\      
-    & Yes &     &     &     &     &      \\ 
-    \hline
-  \end{tabular}
-  \caption{Performance results expressed as elapsed time in seconds using \textbf{replication factor = 100}.}
-  \label{table-mr-perf-100}
 \end{table}
