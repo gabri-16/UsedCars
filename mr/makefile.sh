@@ -2,7 +2,7 @@
 # Launch it from project root to build the project and run the jobs
 
 #Vars
-n_reducer=20
+n_reducer=5
 combiner=0 # 0 -> off; any -> on
 
 #Remove jar from hdfs (if present)
