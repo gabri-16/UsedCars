@@ -20,6 +20,8 @@ The mapper output is a pair where the key is the default one used by Hadoop when
 
 The reduce stage replaces the default key with a ``NullableWritable'' so that the whole job output is a set of records yet. Then, it publishes each record several times as specified by the replication factor.
 
+Actually, the two phases could be collaped into one and reduce stage could be obmitted. However, a better separation of concerns between map related and reduce related responsabilities is preserved by keeping them separated.
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.7]{images/2-mapreduce/MR-job-1.png}
@@ -40,7 +42,20 @@ The reduce stage just calculates average values using single OPIs and reports it
 	\includegraphics[scale=0.7]{images/2-mapreduce/MR-job-2a.png}
 	\caption{Description of ``job 2a: opi'' workflow and interfaces.}
 	\label{fig:MR-job-2a}
-\end{figure}  
+\end{figure}
+
+\subsubsection{Usage of combiners}
+
+The job can be optimized by the usage of combiners. New job execution and interfaces are described in figure \ref{fig:MR-job-2a-combiner}.
+
+The combiner stage calculates a partial average. Since the mean function is not associative, it is required the usage of a support variable so that a weighted mean can be calculated in reduce phase. Hence, interfaces between the different stages are fixed\footnote{Map interface is changed too since output from combiners and mappers must have the same format.} and a new custom ``Writable'' that stores info about partial mean and the number of items used when calculating such mean is created (``OpiAveragePair'').
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.6]{images/2-mapreduce/MR-job-2a-combiner.png}
+	\caption{Description of ``job 2a: opi'' workflow and interfaces with addition of combiners.}
+	\label{fig:MR-job-2a-combiner}
+\end{figure}   
 
 \subsection{Job 2b: Region}
 
@@ -56,6 +71,19 @@ The reducer, given a region, firstly calculates the cardinality for each brand b
 	\caption{Description of ``job 2b: region'' workflow and interfaces.}
 	\label{fig:MR-job-2b}
 \end{figure}  
+
+\subsubsection{Usage of combiners}
+
+The job can be optimized by the usage of combiners. New job execution and interfaces are described in figure \ref{fig:MR-job-2b-combiner}.
+
+The combiner stage calculates partial aggregations on brand frequencies. A support variable is added to save the counting so that partial results can be merged in reduce phase. Hence, interfaces between the different stages are fixed\footnote{Map interface is changed too since output from combiners and mappers must have the same format.} and a new custom ``Writable'' that stores info about brand and its frequency is created (``BrandQuantityPair'').
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.6]{images/2-mapreduce/MR-job-2b-combiner.png}
+	\caption{Description of ``job 2b: region'' workflow and interfaces with addition of combiners.}
+	\label{fig:MR-job-2b-combiner}
+\end{figure} 
 
 \subsection{Job 3: Join}
 
@@ -80,9 +108,25 @@ Performance are evaluated by varying the number of reducers, by enabling the use
 
 Each casuistry result is the average value upon 3 runs. Results are shown in table \ref{table-mr-perf-100}.
 
+\bigskip
+\textit{Number of reducers}
+\bigskip
+
 As we can notice, the optimal number of reducers is 5\footnote{Actually, a more fine-grained analysis could be done by tuning the number of reducers on sigle jobs (instead of the same for each one). This could lead to find a more efficint setup but the number of combinations is quite huge and this argument will not be covered. }: too many reducers are an overkill due to task bootstrap and to the slender amount of data; on the other hand, too few reducers can't parallelize the work in the best way.
 
-Furthermore, by compairing results in tables \ref{table-mr-perf-100} and \ref{table-mr-perf-1}, we can see that execution times for query on the bigger dataset are slightly higher than the other ones. Hence, if we consider that there are two orders of magnitude between the size of the two datasets (8.2MB against 820MB) , it is evident how such an architecture is quite an overkill for small datasets.
+\bigskip
+\textit{Combiners}
+\bigskip
+
+The usage of combiners improves performances independently from the number of reducers used. Obviously, the increase of performance decreases by incrementing the numbers of reducers. Indeed, the best increase is about 24\% when using just one reducer (parallelize aggregation work that would be totally sequential otherwise).
+
+\bigskip
+\textit{Replication factor}
+\bigskip
+
+By compairing results in tables \ref{table-mr-perf-100} and \ref{table-mr-perf-1}, we can see that execution times for query on the bigger dataset are slightly higher than the other ones. Hence, if we consider that there are two orders of magnitude between the size of the two datasets (8.2MB against 820MB) , it is evident how such an architecture is quite an overkill for small datasets.
+
+
 
 \begin{table}[H]
   \centering
@@ -93,7 +137,9 @@ Furthermore, by compairing results in tables \ref{table-mr-perf-100} and \ref{ta
     \hline
     \multirow{2}{4em}{Combiner} 
     & No  & 292 & 244 & 223 & 235 & 251 & 280 & 1235 \\      
-    & Yes &  &  &  &  &  &  & \\ 
+    & Yes & 221 & 215 & 210 & 226 & 228 & 270 & 1176 \\ 
+    \hline
+    \multicolumn{2}{ |c| }{Improvement} & 24.3\% & 11.8\% & 5.8\% & 3.8\% & 9.1\% & 3.5\% & 4.8\% \\
     \hline
   \end{tabular}
   \caption{Performance results expressed as elapsed time in seconds using \textbf{replication factor = 100}.}
@@ -105,11 +151,11 @@ Furthermore, by compairing results in tables \ref{table-mr-perf-100} and \ref{ta
   \begin{tabular}{ |c c|c c c c c| } 
     \hline
     \multicolumn{2}{ |c| }{} & \multicolumn{5}{ c| }{Reducers} \\
-    \multicolumn{2}{ |c| }{} & 1 & 2& 5& 10 & 100 \\
+    \multicolumn{2}{ |c| }{} & 1 & 2 & 5 & 10 & 100 \\
     \hline
     \multirow{2}{4em}{Combiner} 
     & No  & 223 & 162 & 168 & 216 & 1400 \\      
-    & Yes &  &  &  &  &   \\ 
+    & Yes & 154 & 160 & 162 & 210 & 1210 \\ 
     \hline
   \end{tabular}
   \caption{Performance results expressed as elapsed time in seconds using \textbf{replication factor = 1}.}
