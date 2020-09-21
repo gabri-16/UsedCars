@@ -3,7 +3,11 @@ MapReduce stuff is located in directory ``mr``.
 To build and run the project launch the script ``makefile.sh`` using:
     
     cd mr
-    sh makefile.sh $n_reducers
+    sh makefile.sh <n_reducers> <combiners_on>
+
+where pars:
+ - n_reducers = number of reducers to be used
+ - combiners_on = it enables the usage of combiners; 0 -> off; any other -> on 
 
 The script will:
 - Compile all src files
@@ -22,7 +26,7 @@ Spark stuff is located in directory ``spark``.
 To run the project launch the script ``usedcars.sh`` using:
     
     cd spark
-    sh usedcars.sh $n_executors $cores_per_executor
+    sh usedcars.sh <n_executors> <cores_per_executor>
 
 The script will:
 

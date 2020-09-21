@@ -16,15 +16,16 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import utils.Car;
+import utils.BrandQuantityPair;
 
 public class RegionCombiner {
 
-    public static class RegionCombinerMapper extends Mapper<Object, Text, Text, Text> {
+    public static class RegionCombinerMapper extends Mapper<Object, Text, Text, BrandQuantityPair> {
     
         private static final String GAS_FUEL = "gas";        
 
         private Text region = new Text(); 
-        private Text brand = new Text();     
+        private String brand;     
    
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
@@ -32,23 +33,44 @@ public class RegionCombiner {
 
             if (tokens[3].trim().equals(GAS_FUEL)) { 
                 region.set(tokens[0].trim());
-                brand.set(tokens[2].trim());
-                context.write(region, brand);        
+                brand = tokens[2].trim();
+                context.write(region, new BrandQuantityPair(brand, 1));        
             }    
         }
     }
 
-    public static class RegionCombinerReducer extends Reducer<Text, Text, Text, Text> {
+
+    public static class RegionCombinerCombiner extends Reducer<Text, BrandQuantityPair, Text, BrandQuantityPair> {
+
+	public void reduce(Text key, Iterable<BrandQuantityPair> values, Context context) throws IOException, InterruptedException {
+
+            final Map<String, Integer> brandFrequency = new HashMap();
+            for (final BrandQuantityPair p: values) {
+               final String brandName = p.getBrand();
+               if (brandFrequency.containsKey(brandName)) {
+                   brandFrequency.put(brandName, brandFrequency.get(brandName) + 1);
+               } else {
+                   brandFrequency.put(brandName, 1);
+               }
+            }
+                      
+            for (final Entry<String, Integer> e: brandFrequency.entrySet()) {
+              context.write(key, new BrandQuantityPair(e.getKey(), e.getValue()));
+            }
+	}
+    }
+
+    public static class RegionCombinerReducer extends Reducer<Text, BrandQuantityPair, Text, Text> {
 
         private Text topBrand = new Text();
 
-	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+	public void reduce(Text key, Iterable<BrandQuantityPair> values, Context context) throws IOException, InterruptedException {
 
             final Map<String, Integer> brandFrequency = new HashMap();
-            for (final Text brand: values) {
-               final String brandName = brand.toString();
+            for (final BrandQuantityPair p: values) {
+               final String brandName = p.getBrand();
                if (brandFrequency.containsKey(brandName)) {
-                   brandFrequency.put(brandName, brandFrequency.get(brandName) + 1);
+                   brandFrequency.put(brandName, brandFrequency.get(brandName) + p.getQuantity());
                } else {
                    brandFrequency.put(brandName, 1);
                }
@@ -87,8 +109,9 @@ public class RegionCombiner {
         job.setJarByClass(RegionCombiner.class);
 
         job.setMapperClass(RegionCombinerMapper.class);
+        job.setCombinerClass(RegionCombinerCombiner.class);
         job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);		
+        job.setMapOutputValueClass(BrandQuantityPair.class);		
 
 	job.setReducerClass(RegionCombinerReducer.class);
 	job.setOutputKeyClass(Text.class);

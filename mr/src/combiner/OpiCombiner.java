@@ -86,11 +86,11 @@ public class OpiCombiner {
         job.setJarByClass(OpiCombiner.class);
 
         job.setMapperClass(OpiCombinerMapper.class);
+        job.setCombinerClass(OpiCombinerCombiner.class);
 	job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(OpiAveragePair.class);	
 
-        job.setCombinerClass(OpiCombinerCombiner.class);
-
+        job.setReducerClass(OpiCombinerReducer.class);
 	job.setOutputKeyClass(Text.class);
 	job.setOutputValueClass(DoubleWritable.class);
 
