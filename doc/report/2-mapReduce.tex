@@ -89,7 +89,7 @@ The combiner stage calculates partial aggregations on brand frequencies. A suppo
 
 Job execution and interfaces are described in figure \ref{fig:MR-job-3}.
 
-The map stage takes as input pairs structured as (Text, Text). The source of a given pair can be from job 2a output or from job 2b output. By examinating it, it is discovered the source and the pair is marked with a flag.
+The map stage takes as input pairs structured as (Text, Text). The source of a given pair can be from job 2a output or from job 2b output. By examinating a given input record, it is discovered its source and the pair is marked with a flag.
 Since the join key will be the brand, the output of map stage is a pair (brand, (flag, region)), where flag and region are encapsulated into a ``JoinPair'' (a custom ``Writable'').
 
 The reducer executes the join algorithm on input items and creates output pairs in the form (region, (brand, OPI)). 
@@ -101,7 +101,7 @@ The reducer executes the join algorithm on input items and creates output pairs 
 	\label{fig:MR-job-3}
 \end{figure}  
 
-
+\newpage
 \section{Performance evaluation}
 
 Performance are evaluated by varying the number of reducers, by enabling the use of combiners and by considering different replication factors.

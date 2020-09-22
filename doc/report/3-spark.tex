@@ -4,8 +4,9 @@
 
 A unique Spark file will execute all jobs specified in section \ref{workflow}. The dataset is loaded as a Spark ``DataFrame'' and every operation will lean on ``SparkSQL'' layer.
 
-Figure \ref{fig:spark-DAG} shows the complete DAG correspnding to the main job created by Spark. Figure \ref{fig:spark-DAG-info} shows Spark DAG accompained with few extra info.
+Figure \ref{fig:spark-DAG} shows the complete DAG corresponding to the main job created by Spark. Figure \ref{fig:spark-DAG-info} shows Spark DAG accompained with few extra info.
 
+\newpage
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.8]{images/3-spark/spark-DAG.png}
@@ -44,7 +45,7 @@ DAGs for the broadcast version are reported in figures \ref{fig:sspark-broad-DAG
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.8]{images/3-spark/broad-DAG-3.png}
+	\includegraphics[scale=0.65]{images/3-spark/broad-DAG-3.png}
 	\caption{DAG for third job created by Spark when using broadcast on join.}
 	\label{fig:spark-broad-DAG-3}
 \end{figure}
@@ -53,10 +54,11 @@ DAGs for the broadcast version are reported in figures \ref{fig:sspark-broad-DAG
 \section{Performance evaluation}
 
 Performance are evaluated by varying the number of executors and cores per executor. 
+
 Let's consider cluster characteristics (10 nodes, 4 cores per node) and given constraints (usage of 8 CPUs at most).   
 Each casuistry result is the average value upon 3 runs. Results are shown in table \ref{table:spark-perf}.
 
-As we can notice, results confirm common best practice rules: best performances among all more promising combinations are obtained using the maximum number of resources (8 CPUs); moreover, the whole application speeds up when assigning more than one core to each executor.
+As we can notice, results confirm common best practice rules: best performances among all more promising combinations are obtained using the maximum amount of resources (8 CPUs); moreover, the whole application speeds up when assigning more than one core to each executor.
 
 \begin{table}[H]
   \centering
