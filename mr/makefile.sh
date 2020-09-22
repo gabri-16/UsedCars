@@ -13,6 +13,21 @@ then
   hdfs dfs -rm -skipTrash uc.jar
 fi
 
+#Create bin directories (if not existing)
+test -e bin
+res=$?
+if [[ $res != 0 ]]
+then
+  mkdir bin
+fi
+
+test -e bin/utils
+res=$?
+if [[ $res != 0 ]]
+then
+  mkdir bin/utils
+fi
+
 set -e # Break pipeline on error (don't move before test!)
 
 #Compile src
