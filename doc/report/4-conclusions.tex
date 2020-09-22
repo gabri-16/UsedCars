@@ -1,9 +1,0 @@
-\chapter{Conclusions}
-
-As it could be foreshadowed, empirical results confirm theorical results and common best practice rules, that is:
-\begin{itemize}
-  \item \textit{MR vs Spark}: by using best setup found for both programs, Spark (60s ca.) performs better than MR (210s ca.). 
-  \item \textit{Architecture overkill}: It is confirmed that architecture based on cluster, HDFS, Hadoop and so on are designed to work with huge amount of data. Indeed, by varying replication factor, the cluster scales wery well. Rather, such an architecture results to be an overkill for small datasets.
-  \item \textit{MR reducers and combiners}: Optimal number of reducers makes sense if considering number of nodes and amount of data; moreover, the usage of combiners in right points can improve performances. 
-  \item \text{Spark executors}: number of executors and core assigned to each one follow common best practice rules when considering available resources and cluster characteristics.
-\end{itemize}
