@@ -1,0 +1,19 @@
+\babel@toc {english}{}
+\contentsline {chapter}{\numberline {1}Dataset and query}{1}% 
+\contentsline {section}{\numberline {1.1}Dataset}{1}% 
+\contentsline {section}{\numberline {1.2}Query}{1}% 
+\contentsline {subsection}{\numberline {1.2.1}Description}{1}% 
+\contentsline {subsection}{\numberline {1.2.2}Workflow}{2}% 
+\contentsline {chapter}{\numberline {2}MapReduce}{3}% 
+\contentsline {section}{\numberline {2.1}Jobs}{3}% 
+\contentsline {subsection}{\numberline {2.1.1}Job 1: Preprocessing}{3}% 
+\contentsline {subsection}{\numberline {2.1.2}Job 2a: Opi}{4}% 
+\contentsline {subsubsection}{Usage of combiners}{5}% 
+\contentsline {subsection}{\numberline {2.1.3}Job 2b: Region}{6}% 
+\contentsline {subsubsection}{Usage of combiners}{7}% 
+\contentsline {subsection}{\numberline {2.1.4}Job 3: Join}{8}% 
+\contentsline {section}{\numberline {2.2}Performance evaluation}{10}% 
+\contentsline {chapter}{\numberline {3}Spark}{13}% 
+\contentsline {section}{\numberline {3.1}Job description}{13}% 
+\contentsline {section}{\numberline {3.2}Performance evaluation}{18}% 
+\contentsline {chapter}{\numberline {4}Conclusions}{19}% 
